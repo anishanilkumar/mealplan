@@ -1,6 +1,6 @@
 # Mealplan: design
 
-Status: draft for review (2026-11-16). Nothing is built yet.
+Status: reviewed 2026-11-16. Phase 1 built (not deployed); see the README.
 
 Mealplan is a plan of what I eat over the coming week: breakfast, lunch and
 dinner, each filled with recipes from Recipie, plain text, or leftovers of an
@@ -39,35 +39,39 @@ Lives at `plan.anishsheela.com` (web), Friday's **Plan** section (Android), and
 
 ## Data model
 
+One table of rows, one feed (see the README for the sync model):
+
 ```
-cook         id, recipe_id, recipe_rev, title (copied), servings, cooked_on (date, null = planned),
-             grocy_tx_ids (json, after booking), rev, seq, deleted
-slot_item    id, date, slot (breakfast|lunch|dinner), position,
-             kind (recipe|text|leftover), cook_id (recipe: the cook it starts;
-             leftover: the cook it eats from), portions (default 1), text,
-             status (planned|cooked|eaten|skipped), rev, seq, deleted
-draft        id, created_by (claude|me), note, items (json: slot_items not yet in the plan),
-             created_at, state (open|accepted|dismissed)
-settings     key, value: dinner_reminder_at, empty_check (day + time),
-             prep_reminder_at, empty_horizon_days, fridge_days (3), shopping_days
-recipe_cache recipe_id, rev, json, fetched_at
+cook      recipe_id, title (copied), servings, cooked_at (null = not yet),
+          grocy_tx_ids (phase 2, for undo)
+item      date, slot (breakfast|lunch|dinner), position,
+          kind (recipe|leftover|text), cook_id (recipe: the cook it makes;
+          leftover: the cook it eats from), portions (default 1), text,
+          status (planned|eaten|skipped)
+settings  fridge_days (3), shopping_days, dinner_reminder_at,
+          prep_reminder_at, empty_check_day/_at, empty_horizon_days
+recipe    the copy of a Recipie recipe: {recipie_rev, recipe}; server-written
+draft     (phase 3) a week Claude proposes: items not yet in the plan
 ```
 
-A recipe item creates a **cook**: one pot of food. Its servings feed the slot
-that cooks it and any leftover items pointing at it. The portion count is
-`cook.servings - sum(portions of items eating from it)`; below zero is a
-warning, not an error. A leftover dated more than `fridge_days` after the
-cook's date is a warning too.
+Where a cook happens is not stored on the cook: it is the date and slot of
+the recipe item that points at it, so moving that item moves the pot.
+A cook feeds `servings` portions. Items eat from it in plan order;
+skipped ones don't. Warnings per item: `over` (the pot is empty by then),
+`old` (more than `fridge_days` after the cook), `early` (a leftover in or
+before the cooking slot), `orphan` (no cook, or nothing cooks it). The rules
+are in Python and TypeScript (and later Kotlin), held to
+`shared/plan-cases.json`.
 
-Sync is Recipie's: every row has `rev` and a global `seq`, the PWA and Friday
-push dirty rows with their base rev and pull after a cursor; on a conflict the
-server's version wins and the client's edit is kept as a copy (for a slot item:
-a second item in the same slot, marked "(my edit)"). Deletes are tombstones.
+On a sync conflict the server's version wins. A text item's edit is kept
+as a second item in the slot, "(my edit)"; other edits are dropped, since a
+copied recipe item would eat the pot twice.
 
 ## Recipes, from Recipie
 
-Mealplan reads `/api/sync`-style data from Recipie with a service credential
-(see open question 1) and keeps `recipe_cache`. It listens on NATS for a
+Mealplan reads Recipie's `/api/service/sync` (its feed, read only) with a
+client-credentials token from Kanidm, and keeps a copy as rows of kind
+`recipe`. It listens on NATS for a
 `recipes.changed` ping (new subject, published by Recipie) and also re-reads
 every 10 minutes as the safety net. The PWA and Friday get the cached recipes
 through Mealplan's own sync, so the plan shows titles, lids and ingredients
@@ -164,18 +168,16 @@ The web version at `plan.anishsheela.com` has the same screens.
    backup entry. Phase 1 deploys early so it can be used while the rest
    is built.
 
-## Open questions
+## Settled after review (2026-11-16)
 
-1. **Service credential for Recipie.** Recipie has only user sessions today.
-   Proposal: a Kanidm service account with client credentials, its token
-   checked by Recipie like the MCP's bearer tokens, read only. Or a shared
-   secret header between two services on the same box.
-2. **Phase 4 vs parity.** Web and Friday are meant to be equal from day one,
-   but phases 1 to 3 are web first. Is a gap during the build fine as long as
-   both docs say so, or should each phase land on both before moving on?
-3. **Several items in a slot:** is the lid for a slot the worst of its items?
-4. **Past days:** editable (to record what really happened), or frozen once
-   the day is over?
-5. **Eaten / skipped:** worth tracking per item, or is "cooked" enough?
-6. **Drafts and existing items:** does accepting a draft week replace what's
-   already planned, or only fill empty slots?
+1. **Service credential for Recipie:** a Kanidm service account with client
+   credentials; Recipie checks its token as it checks the MCP's bearer
+   tokens, and gives it read access only.
+2. **Parity:** eventual. Phases 1 to 3 are web first; until phase 4 the gap
+   is written down in this repo's README and in Friday's.
+3. **A slot's lid:** the worst lid among its recipe items. Text and leftover
+   items have no lid and don't count.
+4. **Past days:** stay editable, to record what really happened.
+5. **Eaten and skipped:** tracked per item (`status`), besides cooked.
+6. **Accepting a draft:** fills only empty slots; a slot that already has
+   items is left as it is, and the draft says which of its items were skipped.

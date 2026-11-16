@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#0a0e14"/>
+  <!-- A week: seven columns of three meal ticks, today lit. -->
+  <g fill="none" stroke-linecap="round" stroke-width="22">
+    <g stroke="#1d7f96">
+      <path d="M126 176v24M126 246v24M126 316v24"/>
+      <path d="M170 176v24M170 246v24M170 316v24"/>
+      <path d="M258 176v24M258 246v24M258 316v24"/>
+      <path d="M302 176v24M302 246v24M302 316v24"/>
+      <path d="M346 176v24M346 246v24M346 316v24"/>
+      <path d="M390 176v24M390 246v24M390 316v24"/>
+    </g>
+    <path stroke="#3dd6f5" d="M214 176v24M214 246v24M214 316v24"/>
+  </g>
+  <path d="M110 384h292" stroke="#2a3543" stroke-width="12" opacity="0.35"/>
+</svg>

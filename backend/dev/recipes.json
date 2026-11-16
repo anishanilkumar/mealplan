@@ -1,0 +1,102 @@
+[
+ {
+  "id": "dev-0",
+  "rev": 1,
+  "doc": {
+   "title": "Chicken curry",
+   "servings": 4,
+   "ingredients": [],
+   "steps": []
+  }
+ },
+ {
+  "id": "dev-1",
+  "rev": 1,
+  "doc": {
+   "title": "Sambar",
+   "servings": 6,
+   "ingredients": [],
+   "steps": []
+  }
+ },
+ {
+  "id": "dev-2",
+  "rev": 1,
+  "doc": {
+   "title": "Cabbage thoran",
+   "servings": 3,
+   "ingredients": [],
+   "steps": []
+  }
+ },
+ {
+  "id": "dev-3",
+  "rev": 1,
+  "doc": {
+   "title": "Egg roast",
+   "servings": 3,
+   "ingredients": [],
+   "steps": []
+  }
+ },
+ {
+  "id": "dev-4",
+  "rev": 1,
+  "doc": {
+   "title": "Puttu and kadala",
+   "servings": 4,
+   "ingredients": [],
+   "steps": []
+  }
+ },
+ {
+  "id": "dev-5",
+  "rev": 1,
+  "doc": {
+   "title": "Dosa",
+   "servings": 4,
+   "ingredients": [],
+   "steps": []
+  }
+ },
+ {
+  "id": "dev-6",
+  "rev": 1,
+  "doc": {
+   "title": "Moru curry",
+   "servings": 4,
+   "ingredients": [],
+   "steps": []
+  }
+ },
+ {
+  "id": "dev-7",
+  "rev": 1,
+  "doc": {
+   "title": "Bratkartoffeln",
+   "servings": 2,
+   "ingredients": [],
+   "steps": []
+  }
+ },
+ {
+  "id": "dev-8",
+  "rev": 1,
+  "doc": {
+   "title": "Beef fry",
+   "servings": 4,
+   "ingredients": [],
+   "steps": []
+  }
+ },
+ {
+  "id": "dev-9",
+  "rev": 1,
+  "doc": {
+   "title": "Upma",
+   "servings": 2,
+   "ingredients": [],
+   "steps": []
+  }
+ }
+]

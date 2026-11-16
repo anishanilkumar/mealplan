@@ -1,0 +1,81 @@
+{
+  "_comment": "The leftover rules (backend/mealplan/plan.py, frontend/src/plan.ts, Friday's plan/ copy) are all run against these. Change the rules and the cases together.",
+  "cases": [
+    {
+      "name": "a cook eaten within its servings warns nothing",
+      "fridge_days": 3,
+      "cooks": {"c1": {"servings": 3}},
+      "items": [
+        {"id": "a", "date": "2026-11-16", "slot": "dinner", "kind": "recipe", "cook_id": "c1", "portions": 1},
+        {"id": "b", "date": "2026-11-17", "slot": "lunch", "kind": "leftover", "cook_id": "c1", "portions": 1},
+        {"id": "c", "date": "2026-11-18", "slot": "lunch", "kind": "leftover", "cook_id": "c1", "portions": 1}
+      ],
+      "expect": {"items": {}, "cooks": {"c1": {"date": "2026-11-16", "slot": "dinner", "used": 3, "left": 0}}}
+    },
+    {
+      "name": "the item that finds the pot empty is over",
+      "fridge_days": 3,
+      "cooks": {"c1": {"servings": 2}},
+      "items": [
+        {"id": "a", "date": "2026-11-16", "slot": "dinner", "kind": "recipe", "cook_id": "c1", "portions": 1},
+        {"id": "b", "date": "2026-11-17", "slot": "lunch", "kind": "leftover", "cook_id": "c1", "portions": 1},
+        {"id": "c", "date": "2026-11-17", "slot": "dinner", "kind": "leftover", "cook_id": "c1", "portions": 1}
+      ],
+      "expect": {"items": {"c": ["over"]}, "cooks": {"c1": {"date": "2026-11-16", "slot": "dinner", "used": 3, "left": -1}}}
+    },
+    {
+      "name": "a skipped item gives its portions back",
+      "fridge_days": 3,
+      "cooks": {"c1": {"servings": 2}},
+      "items": [
+        {"id": "a", "date": "2026-11-16", "slot": "dinner", "kind": "recipe", "cook_id": "c1", "portions": 1},
+        {"id": "b", "date": "2026-11-17", "slot": "lunch", "kind": "leftover", "cook_id": "c1", "portions": 1, "status": "skipped"},
+        {"id": "c", "date": "2026-11-17", "slot": "dinner", "kind": "leftover", "cook_id": "c1", "portions": 1}
+      ],
+      "expect": {"items": {}, "cooks": {"c1": {"date": "2026-11-16", "slot": "dinner", "used": 2, "left": 0}}}
+    },
+    {
+      "name": "half a portion leaves room; the pot is empty only at its servings",
+      "fridge_days": 3,
+      "cooks": {"c1": {"servings": 2}},
+      "items": [
+        {"id": "a", "date": "2026-11-16", "slot": "lunch", "kind": "recipe", "cook_id": "c1", "portions": 1.5},
+        {"id": "b", "date": "2026-11-16", "slot": "dinner", "kind": "leftover", "cook_id": "c1", "portions": 1}
+      ],
+      "expect": {"items": {}, "cooks": {"c1": {"date": "2026-11-16", "slot": "lunch", "used": 2.5, "left": -0.5}}}
+    },
+    {
+      "name": "a leftover past the fridge days is old",
+      "fridge_days": 3,
+      "cooks": {"c1": {"servings": 4}},
+      "items": [
+        {"id": "a", "date": "2026-11-16", "slot": "dinner", "kind": "recipe", "cook_id": "c1", "portions": 1},
+        {"id": "b", "date": "2026-11-19", "slot": "dinner", "kind": "leftover", "cook_id": "c1", "portions": 1},
+        {"id": "c", "date": "2026-11-20", "slot": "breakfast", "kind": "leftover", "cook_id": "c1", "portions": 1}
+      ],
+      "expect": {"items": {"c": ["old"]}, "cooks": {"c1": {"date": "2026-11-16", "slot": "dinner", "used": 3, "left": 1}}}
+    },
+    {
+      "name": "a leftover in or before the slot that cooks it is early",
+      "fridge_days": 3,
+      "cooks": {"c1": {"servings": 4}},
+      "items": [
+        {"id": "x", "date": "2026-11-16", "slot": "lunch", "kind": "leftover", "cook_id": "c1", "portions": 1},
+        {"id": "a", "date": "2026-11-16", "slot": "dinner", "kind": "recipe", "cook_id": "c1", "portions": 1, "position": 0},
+        {"id": "y", "date": "2026-11-16", "slot": "dinner", "kind": "leftover", "cook_id": "c1", "portions": 1, "position": 1}
+      ],
+      "expect": {"items": {"x": ["early"], "y": ["early"]}, "cooks": {"c1": {"date": "2026-11-16", "slot": "dinner", "used": 3, "left": 1}}}
+    },
+    {
+      "name": "a leftover with no cook, or a cook nothing makes, is orphaned; text is never warned",
+      "fridge_days": 3,
+      "cooks": {"c2": {"servings": 2}},
+      "items": [
+        {"id": "a", "date": "2026-11-16", "slot": "dinner", "kind": "leftover", "cook_id": "gone", "portions": 1},
+        {"id": "b", "date": "2026-11-17", "slot": "dinner", "kind": "leftover", "cook_id": "c2", "portions": 1},
+        {"id": "t", "date": "2026-11-17", "slot": "lunch", "kind": "text", "text": "Canteen"}
+      ],
+      "expect": {"items": {"a": ["orphan"], "b": ["orphan"]}, "cooks": {"c2": {"date": null, "slot": null, "used": 0, "left": 2}}}
+    }
+  ]
+}

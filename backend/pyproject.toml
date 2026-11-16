@@ -1,0 +1,25 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mealplan"
+version = "0.1.0"
+description = "A week of meals over Recipie and Grocy: offline-first PWA backend, with an MCP connector for Claude"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.110",
+    "uvicorn>=0.29",
+    "httpx>=0.27",
+    "pyjwt>=2.8",
+    "cryptography>=42",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["mealplan"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
