@@ -26,7 +26,8 @@ def call(name, **args):
 
 
 def meal(day, slot):
-    return [r["doc"] for r in db.list_live("item") if r["doc"]["date"] == day and r["doc"]["slot"] == slot]
+    rows = [r["doc"] for r in db.list_live("item") if r["doc"]["date"] == day and r["doc"]["slot"] == slot]
+    return sorted(rows, key=lambda d: d["position"])
 
 
 def test_set_slot_cooks_a_pot_and_plans_its_leftovers():
