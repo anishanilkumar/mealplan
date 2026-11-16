@@ -1,6 +1,6 @@
 # Mealplan: design
 
-Status: reviewed 2026-11-16. Phases 1, 2, 3 and 5 built and deployed; phase 4 (Friday) to do. See the README.
+Status: reviewed 2026-11-16. All five phases built and deployed. See the README.
 
 Mealplan is a plan of what I eat over the coming week: breakfast, lunch and
 dinner, each filled with recipes from Recipie, plain text, or leftovers of an

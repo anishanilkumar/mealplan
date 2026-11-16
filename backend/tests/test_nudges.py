@@ -38,7 +38,7 @@ def test_dinner_names_the_pot_and_its_lid_once_a_day():
     assert run(at("15:59")) == []
     sent = run(at("16:00"))
     assert sent[0]["title"] == "Dinner: Chicken curry"
-    assert "almost: Curry leaves" in sent[0]["body"] and sent[0]["section"] == "plan"
+    assert "almost: Curry leaves" in sent[0]["body"] and sent[0]["section"] == "mealplan"
     assert run(at("16:30")) == []  # once a day
     assert len(run(at("16:00", "2026-11-17"))) == 0  # nothing planned for that dinner
 
@@ -51,7 +51,7 @@ def test_dinner_is_quiet_for_leftovers_and_text():
 def test_prep_the_evening_before():
     planops.set_slot("2026-11-17", "lunch", [{"recipe_id": "r-chana"}], replace=False, user="t")
     sent = run(at("21:00"))
-    assert sent == [{"section": "plan", "title": "For tomorrow: Soak the chickpeas",
+    assert sent == [{"section": "mealplan", "title": "For tomorrow: Soak the chickpeas",
                      "body": "Chana masala, lunch: Soak the chickpeas (12 h before)", "ref": "/d/2026-11-17/lunch"}]
 
 

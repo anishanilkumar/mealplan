@@ -14,7 +14,7 @@ its decisions and the phases are in [docs/DESIGN.md](docs/DESIGN.md).
 
 ## Status
 
-Phases 1 (the plan), 2 (the pantry), 3 (Claude) and 5 (nudges, Recipie and Foodlog) are built and deployed:
+All five phases are built and deployed:
 
 - the rolling week, each meal's editor (recipe, leftovers, text; portions,
   servings, eaten or skipped, move, remove), a pot's page, settings
@@ -41,8 +41,12 @@ Phases 1 (the plan), 2 (the pantry), 3 (Claude) and 5 (nudges, Recipie and Foodl
 - Foodlog's estimates get the day's plan as a hint
   (`/api/service/meals`, read only, Foodlog's own Kanidm client)
 
-**Not yet in Friday.** Friday's Plan section is phase 4; until then the plan
-is web only.
+**In Friday.** The Plan section of Friday (`anishanilkumar/friday`, `plan/`)
+has the same screens: the week with Claude's drafts, a meal, a pot with
+booking out, what's missing, settings. It keeps its own copy and syncs in
+the background (WorkManager), the leftover rules in Kotlin held to
+`shared/plan-cases.json`, the lids with Cook's rules. The nudges arrive as
+Friday notifications for the section (`mealplan`).
 
 ## How it fits
 

@@ -29,7 +29,7 @@ from .models import SLOTS, SettingsDoc
 
 log = logging.getLogger(__name__)
 
-SECTION = "plan"
+SECTION = "mealplan"  # Friday's Plan section id: a notice opens it
 WEEKDAY = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
 
