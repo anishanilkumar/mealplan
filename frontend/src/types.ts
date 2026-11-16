@@ -1,5 +1,7 @@
 // The plan's documents, as backend/mealplan/models.py defines them.
 
+import type { Ingredient } from "./cookable";
+
 export type Slot = "breakfast" | "lunch" | "dinner";
 export const SLOTS: Slot[] = ["breakfast", "lunch", "dinner"];
 
@@ -45,13 +47,30 @@ export const DEFAULT_SETTINGS: SettingsDoc = {
   empty_horizon_days: 3,
 };
 
-/** Recipie's recipe, as far as the plan reads it (phase 1: title and servings). */
+/** Recipie's recipe, as far as the plan reads it. */
 export interface Recipe {
   title: string;
   servings?: number | null;
   tags?: string[];
-  ingredients?: unknown[];
+  ingredients?: Ingredient[];
   [k: string]: unknown;
+}
+
+export interface PantryProduct {
+  id: number;
+  name: string;
+  unit: string;
+}
+
+export interface PantrySnapshot {
+  fetched_at: string | null;
+  stale: boolean;
+  error?: string;
+  products: PantryProduct[];
+  /** JSON object keys are strings: {"12": 3.5}. null = never fetched. */
+  stock: Record<string, number> | null;
+  /** Products already on Grocy's shopping list. */
+  shopping: number[];
 }
 
 export interface RecipeCopy {

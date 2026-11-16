@@ -1,8 +1,12 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { useMemo } from "react";
+import { assess, type Status, type Verdict, worst } from "./cookable";
 import { db, getKV } from "./db";
 import { type PlanItem, warnings, type Warnings } from "./plan";
-import { type CookDoc, DEFAULT_SETTINGS, type ItemDoc, keyOf, type LocalRow, type RecipeCopy, type SettingsDoc } from "./types";
+import { PANTRY_KEY } from "./sync";
+import {
+  type CookDoc, DEFAULT_SETTINGS, type ItemDoc, keyOf, type LocalRow, type PantrySnapshot, type RecipeCopy, type SettingsDoc,
+} from "./types";
 
 export interface Plan {
   items: (PlanItem & ItemDoc)[];
@@ -10,15 +14,19 @@ export interface Plan {
   recipes: Map<string, RecipeCopy>;
   warn: Warnings;
   settings: SettingsDoc;
+  pantry: PantrySnapshot | undefined;
+  /** Each recipe's lid against the last pantry snapshot. */
+  lids: Map<string, Verdict>;
 }
 
 /**
- * The whole plan with its warnings. Warnings need every item (a leftover a
- * month on still eats from its pot), and a household's plan is small, so the
- * page holds all of it and filters to the days it shows.
+ * The whole plan with its warnings and lids. Warnings need every item (a
+ * leftover a month on still eats from its pot), and a household's plan is
+ * small, so the page holds all of it and filters to the days it shows.
  */
 export function usePlan(): Plan | undefined {
   const rows = useLiveQuery(() => db.rows.toArray(), []);
+  const pantry = useLiveQuery(() => getKV<PantrySnapshot>(PANTRY_KEY), []);
   return useMemo(() => {
     if (!rows) return undefined;
     const items: (PlanItem & ItemDoc)[] = [];
@@ -33,8 +41,29 @@ export function usePlan(): Plan | undefined {
       else if (r.kind === "settings") settings = { ...DEFAULT_SETTINGS, ...(r as LocalRow<"settings">).doc };
     }
     const warn = warnings(Object.fromEntries(cooks), items, settings.fridge_days);
-    return { items, cooks, recipes, warn, settings };
-  }, [rows]);
+    const stock = pantry?.stock ?? null;
+    const lids = new Map<string, Verdict>();
+    for (const [id, r] of recipes) lids.set(id, assess(r.recipe, stock));
+    return { items, cooks, recipes, warn, settings, pantry, lids };
+  }, [rows, pantry]);
+}
+
+/** A pot's lid: its recipe's, unless it's already cooked (then nothing to check). */
+export function cookLid(plan: Plan, cookId: string | null | undefined): Verdict | undefined {
+  const cook = cookId ? plan.cooks.get(cookId) : undefined;
+  if (!cook || cook.cooked_at) return undefined;
+  return plan.lids.get(cook.recipe_id);
+}
+
+/** A slot's lid: the worst of the pots it cooks that aren't cooked or skipped. */
+export function slotLid(plan: Plan, items: (PlanItem & ItemDoc)[]): Status | null {
+  const statuses: Status[] = [];
+  for (const it of items) {
+    if (it.kind !== "recipe" || it.status === "skipped") continue;
+    const v = cookLid(plan, it.cook_id);
+    if (v) statuses.push(v.status);
+  }
+  return worst(statuses);
 }
 
 export function useRow<K extends "cook" | "item">(kind: K, id: string | undefined): LocalRow<K> | null | undefined {

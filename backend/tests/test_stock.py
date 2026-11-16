@@ -99,7 +99,7 @@ def test_booking_lines_scale_convert_and_cap(client):
 def test_never_more_than_in_stock(client):
     plan_curry(servings=8)  # 1600 g chicken wanted, 500 g there
     lines = {l["ingredient"]: l for l in client.get("/api/cooks/c1/booking").json()["lines"]}
-    assert lines["Chicken"]["amount"] == 500
+    assert lines["Chicken"]["amount"] == 500 and lines["Chicken"]["wanted"] == 1600
 
 
 def test_booking_records_transactions_and_undo_reverses_them(client, grocy):

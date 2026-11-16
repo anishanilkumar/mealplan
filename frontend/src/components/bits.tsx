@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { type Status, STATUS_LABEL } from "../cookable";
 import { ago } from "../dates";
 import { syncNow, useSyncState } from "../sync";
 
@@ -65,3 +66,13 @@ export function Stepper({ label, value, onChange, min = 1, max = 100, step = 1, 
 }
 
 export { fmt as fmtNumber };
+
+/** A lid as the plan shows it: a square in the lid's colour, then its word. */
+export function LidMark({ status, why }: { status: Status; why?: string }) {
+  return (
+    <span className={`lidmark lid-${status}`} title={why}>
+      <span className="lidmark-dot" aria-hidden="true" />
+      {STATUS_LABEL[status]}
+    </span>
+  );
+}

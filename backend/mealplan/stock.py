@@ -102,6 +102,9 @@ def booking_lines(cook: dict, snap: dict | None = None) -> list[dict]:
                 conv = _convert(float(a) * scale, u or "", products[pid], snap)
                 if conv is not None:
                     line["amount"] = _round(min(conv, line["in_stock"]))
+                    # Said, so a cook can see the pot will be short.
+                    if conv > line["in_stock"]:
+                        line["wanted"] = _round(conv)
                     break
         out.append(line)
     return out

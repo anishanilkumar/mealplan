@@ -1,7 +1,7 @@
 import { Link, useSearchParams } from "react-router-dom";
-import { fmtNumber, SyncPill } from "../components/bits";
+import { fmtNumber, LidMark, SyncPill } from "../components/bits";
 import { addDays, dayLabel, range, relDay, shortDate, SLOT_LABEL, today } from "../dates";
-import { itemTitle, type Plan, slotItems, usePlan } from "../hooks";
+import { itemTitle, type Plan, slotItems, slotLid, usePlan } from "../hooks";
 import { WARNING_TEXT } from "../plan";
 import { SLOTS } from "../types";
 
@@ -36,6 +36,7 @@ export function Week() {
       )}
 
       <footer className="foot">
+        <Link className="btn btn-quiet" to="/missing">What's missing</Link>
         <Link className="btn btn-quiet" to="/settings">Settings</Link>
       </footer>
     </main>
@@ -51,6 +52,8 @@ function Day({ plan, date, past, isToday }: { plan: Plan; date: string; past: bo
       </header>
       {SLOTS.map((slot) => {
         const items = slotItems(plan, date, slot);
+        // Lids are about what can still be cooked: none on days gone.
+        const lid = past ? null : slotLid(plan, items);
         return (
           <Link key={slot} className="slot-row" to={`/d/${date}/${slot}`}>
             <span className="label slot-label">{SLOT_LABEL[slot]}</span>
@@ -72,7 +75,10 @@ function Day({ plan, date, past, isToday }: { plan: Plan; date: string; past: bo
                 );
               })}
             </span>
-            <span className="chevron" aria-hidden="true">›</span>
+            <span className="slot-end">
+              {lid && <LidMark status={lid} />}
+              <span className="chevron" aria-hidden="true">›</span>
+            </span>
           </Link>
         );
       })}

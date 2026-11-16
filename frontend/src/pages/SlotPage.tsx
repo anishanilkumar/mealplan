@@ -1,11 +1,10 @@
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { fmtNumber, Stepper, SyncPill } from "../components/bits";
+import { fmtNumber, LidMark, Stepper, SyncPill } from "../components/bits";
+import { reason } from "../cookable";
 import { addDays, dayLabel, days as nDays, mealRef, range, relDay, SLOT_LABEL } from "../dates";
-import { itemTitle, type Plan, slotItems, usePlan } from "../hooks";
-import {
-  addLeftover, addRecipe, addText, markCooked, moveItem, removeItem, unmarkCooked, updateCook, updateItem,
-} from "../ops";
+import { cookLid, itemTitle, type Plan, slotItems, usePlan } from "../hooks";
+import { addLeftover, addRecipe, addText, moveItem, removeItem, updateCook, updateItem } from "../ops";
 import { daysBetween, WARNING_TEXT } from "../plan";
 import { refreshRecipes } from "../sync";
 import { type ItemDoc, type ItemStatus, type Slot, SLOTS } from "../types";
@@ -66,6 +65,7 @@ function ItemCard({ plan, it }: { plan: Plan; it: ItemDoc & { id: string } }) {
   const cook = it.cook_id ? plan.cooks.get(it.cook_id) : undefined;
   const cookState = it.cook_id ? plan.warn.cooks[it.cook_id] : undefined;
   const warns = plan.warn.items[it.id] ?? [];
+  const lid = cookLid(plan, it.cook_id);
 
   let kindLine = "";
   if (it.kind === "recipe") kindLine = "Cooked here";
@@ -86,12 +86,16 @@ function ItemCard({ plan, it }: { plan: Plan; it: ItemDoc & { id: string } }) {
         </div>
         {it.kind === "recipe" && cook && it.cook_id && (
           cook.cooked_at ? (
-            <button type="button" className="btn btn-quiet" onClick={() => void unmarkCooked(it.cook_id!)}>Cooked · undo</button>
+            <Link className="btn btn-quiet" to={`/c/${it.cook_id}`}>Cooked</Link>
           ) : (
-            <button type="button" className="btn" onClick={() => void markCooked(it.cook_id!)}>Mark cooked</button>
+            <Link className="btn" to={`/c/${it.cook_id}?cook=1`}>Mark cooked</Link>
           )
         )}
       </header>
+
+      {it.kind === "recipe" && lid && it.status !== "skipped" && (
+        <p className="lid-line"><LidMark status={lid.status} /> <span className="muted">{reason(lid)}</span></p>
+      )}
 
       {warns.map((w) => <p key={w} className="warn">{WARNING_TEXT[w]}</p>)}
 
@@ -204,7 +208,10 @@ function AddRecipe({ plan, date, slot }: { plan: Plan; date: string; slot: Slot 
                   <span className="row-title">{r.title}</span>
                   {prev && <span className="row-why">{prev === date ? "Already on this day" : `Last ${nDays(daysBetween(prev, date))} before`}</span>}
                 </span>
-                <span className="row-meta">{r.servings ? `${r.servings} serv` : ""}</span>
+                <span className="row-meta pick-meta">
+                  {plan.lids.get(r.id) && <LidMark status={plan.lids.get(r.id)!.status} why={reason(plan.lids.get(r.id)!)} />}
+                  <span>{r.servings ? `${r.servings} serv` : ""}</span>
+                </span>
               </button>
             </li>
           );

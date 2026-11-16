@@ -7,6 +7,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { registerSW } from "virtual:pwa-register";
 import { ConnectionAttr } from "./components/bits";
 import { CookPage } from "./pages/CookPage";
+import { MissingPage } from "./pages/Missing";
 import { Settings } from "./pages/Settings";
 import { SlotPage } from "./pages/SlotPage";
 import { Week } from "./pages/Week";
@@ -16,6 +17,7 @@ const router = createBrowserRouter([
   { path: "/", element: <Week /> },
   { path: "/d/:date/:slot", element: <SlotPage /> },
   { path: "/c/:id", element: <CookPage /> },
+  { path: "/missing", element: <MissingPage /> },
   { path: "/settings", element: <Settings /> },
 ]);
 

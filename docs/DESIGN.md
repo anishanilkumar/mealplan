@@ -1,6 +1,6 @@
 # Mealplan: design
 
-Status: reviewed 2026-11-16. Phase 1 built (not deployed); see the README.
+Status: reviewed 2026-11-16. Phases 1 and 2 built and deployed; see the README.
 
 Mealplan is a plan of what I eat over the coming week: breakfast, lunch and
 dinner, each filled with recipes from Recipie, plain text, or leftovers of an
@@ -71,7 +71,9 @@ copied recipe item would eat the pot twice.
 
 Mealplan reads Recipie's `/api/service/sync` (its feed, read only) with a
 client-credentials token from Kanidm, and keeps a copy as rows of kind
-`recipe`. It listens on NATS for a
+`recipe`. Kanidm's tokens for confidential clients turned out to be opaque,
+so Recipie checks them by introspection (as its own client) rather than
+offline. It listens on NATS for a
 `recipes.changed` ping (new subject, published by Recipie) and also re-reads
 every 10 minutes as the safety net. The PWA and Friday get the cached recipes
 through Mealplan's own sync, so the plan shows titles, lids and ingredients

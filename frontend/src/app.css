@@ -1,15 +1,69 @@
-/* Mealplan's own pieces, on top of starter.css. Only tokens from there; no
-   new colours in phase 1.
+/* Mealplan's own pieces, on top of starter.css.
+
+   One added colour, on purpose and as in Recipie: the lids are a traffic
+   light the cook asked for, so "ready" is Recipie's green (--go, at the
+   arc's brightness), "almost" gold and "not tonight" alert. They mean only
+   that, here as there, and appear nowhere else.
 
    Semantic aliases:
      --cooked:  arc-dim, a pot that is done (recedes, it's history now)
      --warning: gold, a leftover the plan can't keep (empty pot, too old,
-                before it's cooked). Never alert: a plan can always be fixed. */
+                before it's cooked). Never alert: a plan can always be fixed.
+     --ready / --almost / --no / --unknown: the lids. */
 
 :root {
+  --go: #4fd68a;
   --cooked: var(--arc-dim);
   --warning: var(--gold);
+  --ready: var(--go);
+  --almost: var(--gold);
+  --no: var(--alert);
+  --unknown: var(--slate);
 }
+:root[data-connection="offline"] { --go: #4f8a68; }
+
+/* ---- Lids ---------------------------------------------------------------- */
+
+.lidmark {
+  display: inline-flex; align-items: center; gap: 0.375rem; white-space: nowrap;
+  font-family: var(--face-mono); font-size: var(--t-min); letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--c);
+}
+.lidmark-dot { width: 8px; height: 8px; background: var(--c); flex: none; }
+.lid-ready { --c: var(--ready); }
+.lid-almost { --c: var(--almost); }
+.lid-no { --c: var(--no); }
+/* "Can't tell" is read, so its word is ink-dim; only the mark is slate. */
+.lid-unknown { --c: var(--ink-dim); }
+.lid-unknown .lidmark-dot { background: var(--unknown); }
+.lid-line { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 0.625rem; }
+.slot-end { display: flex; align-items: center; gap: 0.625rem; }
+.pick-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 0.25rem; }
+
+/* ---- Booking out, and what's missing ------------------------------------- */
+
+.booking { display: flex; flex-direction: column; gap: 0.875rem; }
+.booking h2 { margin: 0; }
+.book-line { display: flex; align-items: center; gap: 0.75rem; min-height: 56px; padding: 0.5rem 0; }
+.book-none { color: var(--ink-dim); }
+.book-tick { flex: 1; display: flex; align-items: center; gap: 0.875rem; min-width: 0; cursor: pointer; }
+.book-name { font-weight: 600; overflow-wrap: anywhere; }
+.book-none .book-name { font-weight: 500; }
+.book-amount { display: flex; align-items: center; gap: 0.375rem; flex: none; }
+.book-amount .input { width: 5.5rem; text-align: right; font-family: var(--face-mono); }
+.miss-line { min-height: 56px; padding: 0.5rem 0; }
+.miss-line .row-why, .book-line .row-why { white-space: normal; }
+
+/* The starter's tick box, on a real checkbox. */
+input.tick {
+  appearance: none; flex: none; width: 22px; height: 22px; margin: 0;
+  border: var(--rule) solid var(--arc-dim); background: transparent; cursor: pointer;
+}
+input.tick:checked { box-shadow: inset 0 0 0 4px var(--panel), inset 0 0 0 12px var(--arc); }
+input.tick:disabled { border-color: var(--slate-dim); cursor: default; }
+input.tick:disabled:checked { box-shadow: inset 0 0 0 4px var(--panel), inset 0 0 0 12px var(--slate); }
+
+.foot { gap: 0.5rem; flex-wrap: wrap; }
 
 .week-nav { display: flex; justify-content: space-between; gap: 0.5rem; }
 .week-nav .btn { padding: 0 0.75rem; }

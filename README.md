@@ -3,16 +3,17 @@
 A week of meals planned ahead: breakfast, lunch and dinner from the
 [Recipie](https://github.com/anishanilkumar/recipie) recipe book, plain text
 ("canteen"), or leftovers of an earlier pot. It counts what a pot feeds and
-marks a leftover the plan can't keep. Later phases check the plan against the
-pantry (Grocy), put what's missing on the shopping list, book stock out when
-a meal is cooked, and let Claude suggest the week through an MCP connector.
+marks a leftover the plan can't keep, shows each meal's lid against the
+pantry (Grocy), puts what's missing on the shopping list, and books a pot's
+ingredients out of stock when it's cooked. Claude suggesting the week comes
+next (phase 3).
 
-Will live at **https://plan.anishsheela.com** (login required). The design,
+Live at **https://plan.anishsheela.com** (login required). The design,
 its decisions and the phases are in [docs/DESIGN.md](docs/DESIGN.md).
 
 ## Status
 
-Phase 1 (core plan) is built and tested locally, not deployed:
+Phases 1 (the plan) and 2 (the pantry) are built and deployed:
 
 - the rolling week, each meal's editor (recipe, leftovers, text; portions,
   servings, eaten or skipped, move, remove), a pot's page, settings
@@ -20,6 +21,13 @@ Phase 1 (core plan) is built and tested locally, not deployed:
   recipes in the same feed
 - the leftover rules in Python and TypeScript, held to
   `shared/plan-cases.json`
+- lids: Recipie's rules, copied (Python and TypeScript) and held to Recipie's
+  `shared/cookable-cases.json`; a meal shows the worst of its pots'
+- what's missing for the next N days, grouped by product, added to Grocy's
+  shopping list (what's on it already is left out)
+- marking a pot cooked: the ingredients it used, scaled to its servings, in
+  each product's unit (blank where it can't be worked out, never more than
+  in stock), booked out of Grocy; undo puts them back by transaction id
 
 **Not yet in Friday.** Friday's Plan section is phase 4; until then the plan
 is web only.
@@ -72,7 +80,10 @@ npm test
 ```
 
 `MEALPLAN_DEV_USER` skips login and refuses to start with an https public
-URL. `MEALPLAN_RECIPES_FILE` replaces Recipie with a JSON file.
+URL. `MEALPLAN_RECIPES_FILE` replaces Recipie with a JSON file, and
+`MEALPLAN_PANTRY_FILE=dev/pantry.json` replaces Grocy (reads only).
+The lid tests read `../recipie/shared/cookable-cases.json`: keep the recipie
+repo beside this one.
 
 ## Configuration
 
@@ -85,12 +96,16 @@ URL. `MEALPLAN_RECIPES_FILE` replaces Recipie with a JSON file.
 | `MEALPLAN_RECIPIE_URL` | e.g. `https://recipes.anishsheela.com` |
 | `MEALPLAN_RECIPIE_TOKEN_URL` / `_CLIENT_ID` / `_CLIENT_SECRET` | Kanidm client-credentials for Recipie's service feed |
 | `MEALPLAN_RECIPES_REFRESH` | Seconds between looks at Recipie without a ping (600) |
-| `MEALPLAN_NATS_URL` / `_NATS_USER` / `_NATS_PASSWORD_FILE` | `recipes.changed` in |
+| `MEALPLAN_RECIPIE_SCOPE` | Scope to ask Kanidm for (none) |
+| `GROCY_API_URL` / `GROCY_API_KEY` | The pantry, through grocy-mcp (on `PYTHONPATH`) |
+| `GROCY_MCP_NATS_*` | `pantry.changed` out, after booking a pot out |
+| `MEALPLAN_NATS_URL` / `_NATS_USER` / `_NATS_PASSWORD_FILE` | `recipes.changed` and `pantry.changed` in |
 
 ## Deploying
 
 The server side (unit, vhost, Kanidm clients, NATS login, backup) is declared
-in the NixOS configuration, not here; that is phase 6. Code ships with
+in the NixOS configuration (`infra/nixos_config`, "Mealplan" in its CLAUDE.md),
+not here. Code ships with
 `./deploy.sh` (target in a gitignored `.deploy.env`, see `.deploy.env.example`).
 
 ## Licence

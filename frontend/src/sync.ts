@@ -14,7 +14,7 @@
 
 import { useSyncExternalStore } from "react";
 import { db, getKV, setKV } from "./db";
-import { type ItemDoc, keyOf, type LocalRow, newId, type ServerRow } from "./types";
+import { type ItemDoc, keyOf, type LocalRow, newId, type PantrySnapshot, type ServerRow } from "./types";
 
 export type SyncPhase = "idle" | "syncing" | "offline" | "signed-out" | "error";
 
@@ -147,6 +147,20 @@ export async function pull(): Promise<void> {
   }
 }
 
+export const PANTRY_KEY = "pantry";
+
+/** The stock the lids are worked out from, kept for offline. */
+async function refreshPantry(): Promise<void> {
+  const snap = await api<PantrySnapshot>("/api/pantry");
+  const previous = await getKV<PantrySnapshot>(PANTRY_KEY);
+  // Grocy down and the server has nothing either: keep the older snapshot, marked.
+  if (snap.stock == null && previous?.stock != null) {
+    await setKV(PANTRY_KEY, { ...previous, stale: true });
+    return;
+  }
+  await setKV(PANTRY_KEY, snap);
+}
+
 let running: Promise<void> | null = null;
 let again = false;
 
@@ -175,6 +189,7 @@ async function runOnce(): Promise<void> {
   try {
     if (await push()) await push();
     await pull();
+    await refreshPantry();
     await setKV("me", await api<{ username: string }>("/api/me"));
     const now = new Date().toISOString();
     await setKV("lastSyncedAt", now);

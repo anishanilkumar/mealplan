@@ -1,101 +1,390 @@
 [
  {
   "id": "dev-0",
-  "rev": 1,
+  "rev": 2,
   "doc": {
    "title": "Chicken curry",
    "servings": 4,
-   "ingredients": [],
+   "ingredients": [
+    {
+     "name": "Chicken",
+     "role": "main",
+     "amount": 800,
+     "unit": "g",
+     "grocy_product_ids": [
+      1
+     ]
+    },
+    {
+     "name": "Coconut oil",
+     "role": "minor",
+     "amount": 28,
+     "unit": "g",
+     "grocy_product_ids": [
+      2
+     ],
+     "substitutes": [
+      {
+       "name": "Ghee",
+       "grocy_product_ids": [
+        3
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Onion",
+     "role": "minor",
+     "amount": 300,
+     "unit": "g",
+     "grocy_product_ids": [
+      4
+     ]
+    },
+    {
+     "name": "Curry leaves",
+     "role": "minor",
+     "amount": null,
+     "unit": "",
+     "grocy_product_ids": [
+      5
+     ]
+    },
+    {
+     "name": "Salt",
+     "role": "minor"
+    }
+   ],
    "steps": []
   }
  },
  {
   "id": "dev-1",
-  "rev": 1,
+  "rev": 2,
   "doc": {
    "title": "Sambar",
    "servings": 6,
-   "ingredients": [],
+   "ingredients": [
+    {
+     "name": "Toor dal",
+     "role": "main",
+     "amount": 200,
+     "unit": "g",
+     "grocy_product_ids": [
+      6
+     ]
+    },
+    {
+     "name": "Tamarind",
+     "role": "minor",
+     "amount": 20,
+     "unit": "g",
+     "grocy_product_ids": [
+      7
+     ]
+    },
+    {
+     "name": "Onion",
+     "role": "minor",
+     "amount": 150,
+     "unit": "g",
+     "grocy_product_ids": [
+      4
+     ]
+    },
+    {
+     "name": "Curry leaves",
+     "role": "minor",
+     "amount": null,
+     "unit": "",
+     "grocy_product_ids": [
+      5
+     ]
+    }
+   ],
    "steps": []
   }
  },
  {
   "id": "dev-2",
-  "rev": 1,
+  "rev": 2,
   "doc": {
    "title": "Cabbage thoran",
    "servings": 3,
-   "ingredients": [],
+   "ingredients": [
+    {
+     "name": "Cabbage",
+     "role": "main",
+     "amount": 1,
+     "unit": "",
+     "grocy_product_ids": [
+      8
+     ]
+    },
+    {
+     "name": "Grated coconut",
+     "role": "minor",
+     "amount": 80,
+     "unit": "g",
+     "grocy_product_ids": [
+      9
+     ]
+    },
+    {
+     "name": "Coconut oil",
+     "role": "minor",
+     "amount": 28,
+     "unit": "g",
+     "grocy_product_ids": [
+      2
+     ],
+     "substitutes": [
+      {
+       "name": "Ghee",
+       "grocy_product_ids": [
+        3
+       ]
+      }
+     ]
+    }
+   ],
    "steps": []
   }
  },
  {
   "id": "dev-3",
-  "rev": 1,
+  "rev": 2,
   "doc": {
    "title": "Egg roast",
    "servings": 3,
-   "ingredients": [],
+   "ingredients": [
+    {
+     "name": "Eggs",
+     "role": "main",
+     "amount": 6,
+     "unit": "",
+     "grocy_product_ids": [
+      10
+     ]
+    },
+    {
+     "name": "Onion",
+     "role": "minor",
+     "amount": 400,
+     "unit": "g",
+     "grocy_product_ids": [
+      4
+     ]
+    },
+    {
+     "name": "Coconut oil",
+     "role": "minor",
+     "amount": 28,
+     "unit": "g",
+     "grocy_product_ids": [
+      2
+     ],
+     "substitutes": [
+      {
+       "name": "Ghee",
+       "grocy_product_ids": [
+        3
+       ]
+      }
+     ]
+    }
+   ],
    "steps": []
   }
  },
  {
   "id": "dev-4",
-  "rev": 1,
+  "rev": 2,
   "doc": {
    "title": "Puttu and kadala",
    "servings": 4,
-   "ingredients": [],
+   "ingredients": [
+    {
+     "name": "Rice flour",
+     "role": "main",
+     "amount": 400,
+     "unit": "g",
+     "grocy_product_ids": [
+      12
+     ]
+    },
+    {
+     "name": "Black chickpeas",
+     "role": "main",
+     "amount": 250,
+     "unit": "g",
+     "grocy_product_ids": [
+      13
+     ]
+    },
+    {
+     "name": "Grated coconut",
+     "role": "minor",
+     "amount": 100,
+     "unit": "g",
+     "grocy_product_ids": [
+      9
+     ]
+    }
+   ],
    "steps": []
   }
  },
  {
   "id": "dev-5",
-  "rev": 1,
+  "rev": 2,
   "doc": {
    "title": "Dosa",
    "servings": 4,
-   "ingredients": [],
+   "ingredients": [
+    {
+     "name": "Dosa batter",
+     "role": "main",
+     "amount": 800,
+     "unit": "g",
+     "grocy_product_ids": [
+      17
+     ]
+    }
+   ],
    "steps": []
   }
  },
  {
   "id": "dev-6",
-  "rev": 1,
+  "rev": 2,
   "doc": {
    "title": "Moru curry",
    "servings": 4,
-   "ingredients": [],
+   "ingredients": [
+    {
+     "name": "Curd",
+     "role": "main",
+     "amount": 400,
+     "unit": "g",
+     "grocy_product_ids": [
+      14
+     ]
+    },
+    {
+     "name": "Curry leaves",
+     "role": "minor",
+     "amount": null,
+     "unit": "",
+     "grocy_product_ids": [
+      5
+     ]
+    }
+   ],
    "steps": []
   }
  },
  {
   "id": "dev-7",
-  "rev": 1,
+  "rev": 2,
   "doc": {
    "title": "Bratkartoffeln",
    "servings": 2,
-   "ingredients": [],
+   "ingredients": [
+    {
+     "name": "Potatoes",
+     "role": "main",
+     "amount": 600,
+     "unit": "g",
+     "grocy_product_ids": [
+      11
+     ]
+    },
+    {
+     "name": "Bacon",
+     "role": "minor",
+     "amount": 100,
+     "unit": "g",
+     "grocy_product_ids": [
+      18
+     ]
+    },
+    {
+     "name": "Onion",
+     "role": "minor",
+     "amount": 100,
+     "unit": "g",
+     "grocy_product_ids": [
+      4
+     ]
+    }
+   ],
    "steps": []
   }
  },
  {
   "id": "dev-8",
-  "rev": 1,
+  "rev": 2,
   "doc": {
    "title": "Beef fry",
    "servings": 4,
-   "ingredients": [],
+   "ingredients": [
+    {
+     "name": "Beef",
+     "role": "main",
+     "amount": 700,
+     "unit": "g",
+     "grocy_product_ids": [
+      15
+     ]
+    },
+    {
+     "name": "Coconut oil",
+     "role": "minor",
+     "amount": 28,
+     "unit": "g",
+     "grocy_product_ids": [
+      2
+     ],
+     "substitutes": [
+      {
+       "name": "Ghee",
+       "grocy_product_ids": [
+        3
+       ]
+      }
+     ]
+    }
+   ],
    "steps": []
   }
  },
  {
   "id": "dev-9",
-  "rev": 1,
+  "rev": 2,
   "doc": {
    "title": "Upma",
    "servings": 2,
-   "ingredients": [],
+   "ingredients": [
+    {
+     "name": "Semolina",
+     "role": "main",
+     "amount": 150,
+     "unit": "g",
+     "grocy_product_ids": [
+      16
+     ]
+    },
+    {
+     "name": "Onion",
+     "role": "minor",
+     "amount": 80,
+     "unit": "g",
+     "grocy_product_ids": [
+      4
+     ]
+    }
+   ],
    "steps": []
   }
  }
