@@ -34,8 +34,11 @@ class Settings:
     recipie_token_url: str
     recipie_client_id: str
     recipie_client_secret: str
+    recipie_scope: str
     recipes_file: str
     recipes_refresh_seconds: int
+    # Development only: a JSON pantry instead of Grocy (pantry.py).
+    pantry_file: str
 
     @property
     def secure_cookies(self) -> bool:
@@ -62,9 +65,11 @@ def settings() -> Settings:
         recipie_token_url=_env("RECIPIE_TOKEN_URL"),
         recipie_client_id=_env("RECIPIE_CLIENT_ID"),
         recipie_client_secret=_env("RECIPIE_CLIENT_SECRET"),
+        recipie_scope=_env("RECIPIE_SCOPE"),
         recipes_file=_env("RECIPES_FILE"),
         # The safety net under the recipes.changed ping.
         recipes_refresh_seconds=int(_env("RECIPES_REFRESH", "600")),
+        pantry_file=_env("PANTRY_FILE"),
     )
     if s.dev_user and s.secure_cookies:
         raise RuntimeError("MEALPLAN_DEV_USER skips login; it cannot be used with an https public URL.")

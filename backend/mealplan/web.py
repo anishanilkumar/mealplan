@@ -10,10 +10,10 @@ from __future__ import annotations
 import logging
 from typing import Literal
 
-from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from pydantic import BaseModel, Field, ValidationError
 
-from . import auth_web, db, recipes
+from . import auth_web, db, pantry, recipes, stock
 from .models import MODELS
 
 log = logging.getLogger(__name__)
@@ -65,6 +65,7 @@ def create_app(*, watch_recipes: bool = True) -> FastAPI:
     app.include_router(auth_web.router)
     if watch_recipes:
         recipes.watch()
+        pantry.watch_changes()
 
     @app.get("/api/health")
     def health():
@@ -89,4 +90,59 @@ def create_app(*, watch_recipes: bool = True) -> FastAPI:
         # saved in Recipie and the ping hasn't arrived (or NATS is off).
         return {"changed": recipes.refresh()}
 
+    # --- the pantry (phase 2): lids, what's missing, booking out ---------------
+
+    @app.get("/api/pantry")
+    def get_pantry(user: str = Depends(require_user)):
+        return pantry.for_client(pantry.snapshot())
+
+    @app.get("/api/missing")
+    def get_missing(start: str = Query(pattern=DATE), days: int = Query(3, ge=1, le=14),
+                    user: str = Depends(require_user)):
+        return stock.missing(start, days)
+
+    @app.post("/api/shopping")
+    def add_shopping(body: ShoppingBody, user: str = Depends(require_user)):
+        return stock.add_to_shopping(body.product_ids)
+
+    @app.get("/api/cooks/{cook_id}/booking")
+    def booking(cook_id: str, user: str = Depends(require_user)):
+        row = db.get("cook", cook_id)
+        if row is None:
+            raise HTTPException(404, "No such pot.")
+        snap = pantry.snapshot(max_age=0)
+        return {"lines": stock.booking_lines(row["doc"], snap), "stale": bool(snap.get("stale")),
+                "error": snap.get("error")}
+
+    @app.post("/api/cooks/{cook_id}/cooked")
+    def cooked(cook_id: str, body: BookBody, user: str = Depends(require_user)):
+        try:
+            return stock.book(cook_id, [l.model_dump() for l in body.lines], user)
+        except KeyError:
+            raise HTTPException(404, "No such pot.")
+
+    @app.post("/api/cooks/{cook_id}/uncooked")
+    def uncooked(cook_id: str, user: str = Depends(require_user)):
+        try:
+            return stock.unbook(cook_id, user)
+        except KeyError:
+            raise HTTPException(404, "No such pot.")
+
     return app
+
+
+DATE = r"^\d{4}-\d{2}-\d{2}$"
+
+
+class ShoppingBody(BaseModel):
+    product_ids: list[int] = Field(min_length=1, max_length=200)
+
+
+class BookLine(BaseModel):
+    product_id: int
+    amount: float = Field(ge=0, le=100000)
+    product: str | None = None
+
+
+class BookBody(BaseModel):
+    lines: list[BookLine] = Field(max_length=100)

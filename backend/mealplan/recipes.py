@@ -42,9 +42,12 @@ def _bearer() -> str:
     s = settings()
     if _token and _token[1] > time.time() + 60:
         return _token[0]
+    data = {"grant_type": "client_credentials"}
+    if s.recipie_scope:
+        data["scope"] = s.recipie_scope
     r = httpx.post(
         s.recipie_token_url,
-        data={"grant_type": "client_credentials", "scope": "recipes.read"},
+        data=data,
         auth=(s.recipie_client_id, s.recipie_client_secret),
         timeout=15,
     )
