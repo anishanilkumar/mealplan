@@ -5,7 +5,7 @@ import { db, getKV } from "./db";
 import { type PlanItem, warnings, type Warnings } from "./plan";
 import { PANTRY_KEY } from "./sync";
 import {
-  type CookDoc, DEFAULT_SETTINGS, type ItemDoc, keyOf, type LocalRow, type PantrySnapshot, type RecipeCopy, type SettingsDoc,
+  type CookDoc, DEFAULT_SETTINGS, type DraftDoc, type ItemDoc, keyOf, type LocalRow, type PantrySnapshot, type RecipeCopy, type SettingsDoc,
 } from "./types";
 
 export interface Plan {
@@ -17,6 +17,8 @@ export interface Plan {
   pantry: PantrySnapshot | undefined;
   /** Each recipe's lid against the last pantry snapshot. */
   lids: Map<string, Verdict>;
+  /** Claude's proposals still waiting for an answer, newest first. */
+  drafts: { id: string; doc: DraftDoc }[];
 }
 
 /**
@@ -33,8 +35,14 @@ export function usePlan(): Plan | undefined {
     const cooks = new Map<string, CookDoc>();
     const recipes = new Map<string, RecipeCopy>();
     let settings = DEFAULT_SETTINGS;
+    const drafts: { id: string; doc: DraftDoc }[] = [];
     for (const r of rows) {
       if (r.deleted) continue;
+      if (r.kind === "draft") {
+        const doc = (r as LocalRow<"draft">).doc;
+        if (doc.state === "open") drafts.push({ id: r.id, doc });
+        continue;
+      }
       if (r.kind === "item") items.push({ ...(r as LocalRow<"item">).doc, id: r.id });
       else if (r.kind === "cook") cooks.set(r.id, (r as LocalRow<"cook">).doc);
       else if (r.kind === "recipe") recipes.set(r.id, (r as LocalRow<"recipe">).doc);
@@ -44,7 +52,8 @@ export function usePlan(): Plan | undefined {
     const stock = pantry?.stock ?? null;
     const lids = new Map<string, Verdict>();
     for (const [id, r] of recipes) lids.set(id, assess(r.recipe, stock));
-    return { items, cooks, recipes, warn, settings, pantry, lids };
+    drafts.sort((a, b) => b.doc.created_at.localeCompare(a.doc.created_at));
+    return { items, cooks, recipes, warn, settings, pantry, lids, drafts };
   }, [rows, pantry]);
 }
 

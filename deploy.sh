@@ -37,5 +37,5 @@ rsync -az frontend/dist/index.html frontend/dist/sw.js "$target:$DEPLOY_WEB_DIR/
 rsync -az --delete frontend/dist/ "$target:$DEPLOY_WEB_DIR/"
 
 echo "==> Restarting"
-ssh "$target" 'sudo systemctl restart mealplan-web && systemctl is-active mealplan-web'
+ssh "$target" 'sudo systemctl restart mealplan-web mealplan-mcp && systemctl is-active mealplan-web mealplan-mcp'
 echo "Deployed."

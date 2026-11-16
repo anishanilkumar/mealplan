@@ -34,7 +34,7 @@ export async function setKV(key: string, value: unknown): Promise<void> {
 }
 
 /** Save an edit locally; the next sync sends it. Call inside or outside a transaction. */
-export async function putLocal<K extends Exclude<Kind, "recipe">>(kind: K, id: string, doc: DocOf[K]): Promise<void> {
+export async function putLocal<K extends Exclude<Kind, "recipe" | "draft">>(kind: K, id: string, doc: DocOf[K]): Promise<void> {
   const key = keyOf(kind, id);
   const existing = await db.rows.get(key);
   await db.rows.put({
@@ -49,7 +49,7 @@ export async function putLocal<K extends Exclude<Kind, "recipe">>(kind: K, id: s
   });
 }
 
-export async function deleteLocal(kind: Exclude<Kind, "recipe">, id: string): Promise<void> {
+export async function deleteLocal(kind: Exclude<Kind, "recipe" | "draft">, id: string): Promise<void> {
   const key = keyOf(kind, id);
   const existing = await db.rows.get(key);
   if (!existing) return;

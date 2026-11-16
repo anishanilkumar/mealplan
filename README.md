@@ -5,15 +5,16 @@ A week of meals planned ahead: breakfast, lunch and dinner from the
 ("canteen"), or leftovers of an earlier pot. It counts what a pot feeds and
 marks a leftover the plan can't keep, shows each meal's lid against the
 pantry (Grocy), puts what's missing on the shopping list, and books a pot's
-ingredients out of stock when it's cooked. Claude suggesting the week comes
-next (phase 3).
+ingredients out of stock when it's cooked. Claude reads the plan, suggests
+weeks as drafts to accept, and fills a meal when asked, through an MCP
+connector.
 
 Live at **https://plan.anishsheela.com** (login required). The design,
 its decisions and the phases are in [docs/DESIGN.md](docs/DESIGN.md).
 
 ## Status
 
-Phases 1 (the plan) and 2 (the pantry) are built and deployed:
+Phases 1 (the plan), 2 (the pantry) and 3 (Claude) are built and deployed:
 
 - the rolling week, each meal's editor (recipe, leftovers, text; portions,
   servings, eaten or skipped, move, remove), a pot's page, settings
@@ -28,6 +29,10 @@ Phases 1 (the plan) and 2 (the pantry) are built and deployed:
 - marking a pot cooked: the ingredients it used, scaled to its servings, in
   each product's unit (blank where it can't be worked out, never more than
   in stock), booked out of Grocy; undo puts them back by transaction id
+
+- Claude: `get_plan`, `cook_history`, `list_recipes`, `whats_missing`; `set_slot`
+  writes one meal when asked; `propose_week` saves a draft that shows on the
+  week to accept (fills only empty meals) or dismiss
 
 **Not yet in Friday.** Friday's Plan section is phase 4; until then the plan
 is web only.
@@ -62,6 +67,19 @@ Phone / browser (PWA)              Server
   the cooking slot `early`, one with no cook `orphan`
   (`backend/mealplan/plan.py`, `frontend/src/plan.ts`).
 
+## Adding the connector in Claude
+
+Settings → Connectors → Add custom connector:
+
+```
+URL:        https://plan-mcp.anishsheela.com/mcp
+Client ID:  claude-mealplan
+Secret:     leave blank (public PKCE client)
+```
+
+Kanidm group `mcp.mealplan`. Then ask things like "plan next week, leftovers
+for lunch", "what's for dinner tomorrow?", or "put sambar on Thursday lunch".
+
 ## Development
 
 ```bash
@@ -71,6 +89,8 @@ uv venv .venv && uv pip install -e '.[dev]'
 .venv/bin/pytest
 MEALPLAN_DB=dev.db MEALPLAN_DEV_USER=me MEALPLAN_RECIPES_FILE=dev/recipes.json \
   .venv/bin/python -m mealplan web          # :8796
+MEALPLAN_DB=dev.db MEALPLAN_PANTRY_FILE=dev/pantry.json \
+  .venv/bin/python -m mealplan mcp --no-auth  # :8797/mcp
 
 # Frontend (proxies /api and /auth to :8796)
 cd frontend
@@ -96,6 +116,7 @@ repo beside this one.
 | `MEALPLAN_RECIPIE_URL` | e.g. `https://recipes.anishsheela.com` |
 | `MEALPLAN_RECIPIE_TOKEN_URL` / `_CLIENT_ID` / `_CLIENT_SECRET` | Kanidm client-credentials for Recipie's service feed |
 | `MEALPLAN_RECIPES_REFRESH` | Seconds between looks at Recipie without a ping (600) |
+| `MEALPLAN_MCP_OIDC_ISSUER` / `_JWKS_URI` / `_AUDIENCE` / `_SCOPES` | The connector's bearer tokens (Kanidm client `claude-mealplan`) |
 | `MEALPLAN_RECIPIE_SCOPE` | Scope to ask Kanidm for (none) |
 | `GROCY_API_URL` / `GROCY_API_KEY` | The pantry, through grocy-mcp (on `PYTHONPATH`) |
 | `GROCY_MCP_NATS_*` | `pantry.changed` out, after booking a pot out |

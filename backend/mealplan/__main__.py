@@ -1,4 +1,4 @@
-"""python -m mealplan web [--port 8796]"""
+"""python -m mealplan web [--port 8796]  |  mcp [--port 8797]"""
 
 from __future__ import annotations
 
@@ -9,8 +9,13 @@ import sys
 
 def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
-    if len(sys.argv) < 2 or sys.argv[1] not in ("web",):
+    if len(sys.argv) < 2 or sys.argv[1] not in ("web", "mcp"):
         sys.exit(__doc__)
+    if sys.argv[1] == "mcp":
+        from .mcp_server import main as mcp_main
+
+        mcp_main(sys.argv[2:])
+        return
     import uvicorn
 
     from .web import create_app

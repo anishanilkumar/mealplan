@@ -13,7 +13,7 @@ from typing import Literal
 from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from pydantic import BaseModel, Field, ValidationError
 
-from . import auth_web, db, pantry, recipes, stock
+from . import auth_web, db, pantry, planops, recipes, stock
 from .models import MODELS
 
 log = logging.getLogger(__name__)
@@ -128,10 +128,28 @@ def create_app(*, watch_recipes: bool = True) -> FastAPI:
         except KeyError:
             raise HTTPException(404, "No such pot.")
 
+    # --- Claude's drafts (phase 3) -----------------------------------------------
+
+    @app.post("/api/drafts/{draft_id}/accept")
+    def accept(draft_id: str, user: str = Depends(require_user)):
+        try:
+            return planops.accept_draft(draft_id, user)
+        except KeyError:
+            raise HTTPException(404, "No such draft.")
+        except ValueError as e:
+            raise HTTPException(409, str(e))
+
+    @app.post("/api/drafts/{draft_id}/dismiss")
+    def dismiss(draft_id: str, user: str = Depends(require_user)):
+        try:
+            return planops.dismiss_draft(draft_id, user)
+        except KeyError:
+            raise HTTPException(404, "No such draft.")
+
     return app
 
 
-DATE = r"^\d{4}-\d{2}-\d{2}$"
+DATE =r"^\d{4}-\d{2}-\d{2}$"
 
 
 class ShoppingBody(BaseModel):

@@ -89,4 +89,47 @@ class SettingsDoc(BaseModel):
     empty_horizon_days: int = Field(default=3, ge=1, le=14)
 
 
+class Entry(BaseModel):
+    """One thing to put in a meal: what Claude writes (set_slot, propose_week).
+
+    Exactly one of recipe_id, leftover_of or text. A leftover names the cook
+    it eats from, or, inside a draft, the `key` of a recipe entry in the same
+    draft.
+    """
+    recipe_id: str | None = Field(default=None, max_length=64)
+    servings: int | None = Field(default=None, ge=1, le=100, description="For a recipe: how many portions to cook; default the recipe's")
+    leftover_of: str | None = Field(default=None, max_length=64, description="A cook id, or a recipe entry's key in the same draft")
+    text: str | None = Field(default=None, max_length=200, description="Anything without a recipe: 'Canteen', 'Eat out'")
+    portions: float = Field(default=1, gt=0, le=100)
+    key: str | None = Field(default=None, max_length=40, description="A recipe entry's name for leftovers in the same draft to point at")
+
+    @model_validator(mode="after")
+    def _one(self):
+        given = [x for x in (self.recipe_id, self.leftover_of, self.text and self.text.strip()) if x]
+        if len(given) != 1:
+            raise ValueError("An entry is exactly one of recipe_id, leftover_of or text.")
+        return self
+
+
+class DraftEntry(Entry):
+    date: str = Field(pattern=DATE)
+    slot: Slot
+
+
+DraftState = Literal["open", "accepted", "dismissed"]
+
+
+class DraftDoc(BaseModel):
+    """A week Claude proposed. Written by the server only; accepting it fills
+    the empty meals and leaves the rest as they are."""
+    note: str = Field(default="", max_length=2000)
+    created_at: str = Field(max_length=40)
+    entries: list[DraftEntry] = Field(max_length=100)
+    state: DraftState = "open"
+    # After accepting: what went in, and what was left out because the meal
+    # already had something.
+    placed: int = 0
+    skipped: list[str] = Field(default_factory=list, max_length=100)
+
+
 MODELS: dict[str, type[BaseModel]] = {"cook": CookDoc, "item": ItemDoc, "settings": SettingsDoc}

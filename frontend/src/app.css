@@ -65,6 +65,16 @@ input.tick:disabled:checked { box-shadow: inset 0 0 0 4px var(--panel), inset 0 
 
 .foot { gap: 0.5rem; flex-wrap: wrap; }
 
+/* ---- Claude's drafts ----------------------------------------------------- */
+
+/* A proposal, not the plan: an arc rule down its side says "waiting for you". */
+.draft { display: flex; flex-direction: column; gap: 0.625rem; border-left: 6px solid var(--arc); }
+.draft-head { display: flex; justify-content: space-between; align-items: baseline; gap: 0.75rem; }
+.draft-head h2, .draft-sum, .draft-note { margin: 0; }
+.draft-sum { font-weight: 600; }
+.draft-entry { display: flex; flex-direction: column; gap: 0.125rem; padding: 0.5rem 0; }
+.draft-taken .book-name { color: var(--ink-dim); text-decoration: line-through; text-decoration-thickness: 2px; }
+
 .week-nav { display: flex; justify-content: space-between; gap: 0.5rem; }
 .week-nav .btn { padding: 0 0.75rem; }
 

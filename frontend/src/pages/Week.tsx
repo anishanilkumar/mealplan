@@ -1,5 +1,6 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { fmtNumber, LidMark, SyncPill } from "../components/bits";
+import { Drafts } from "../components/Drafts";
 import { addDays, dayLabel, range, relDay, shortDate, SLOT_LABEL, today } from "../dates";
 import { itemTitle, type Plan, slotItems, slotLid, usePlan } from "../hooks";
 import { WARNING_TEXT } from "../plan";
@@ -32,7 +33,10 @@ export function Week() {
           {days.map((d) => <div key={d} className="placeholder-line day-placeholder" />)}
         </div>
       ) : (
-        days.map((d) => <Day key={d} plan={plan} date={d} past={d < t} isToday={d === t} />)
+        <>
+          <Drafts plan={plan} />
+          {days.map((d) => <Day key={d} plan={plan} date={d} past={d < t} isToday={d === t} />)}
+        </>
       )}
 
       <footer className="foot">

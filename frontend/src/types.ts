@@ -78,13 +78,35 @@ export interface RecipeCopy {
   recipe: Recipe;
 }
 
-export type Kind = "cook" | "item" | "settings" | "recipe";
+export interface DraftEntry {
+  date: string;
+  slot: Slot;
+  recipe_id?: string | null;
+  servings?: number | null;
+  leftover_of?: string | null;
+  text?: string | null;
+  portions: number;
+  key?: string | null;
+}
+
+/** A week Claude proposed; server-written, accepted or dismissed in the app. */
+export interface DraftDoc {
+  note: string;
+  created_at: string;
+  entries: DraftEntry[];
+  state: "open" | "accepted" | "dismissed";
+  placed: number;
+  skipped: string[];
+}
+
+export type Kind = "cook" | "item" | "settings" | "recipe" | "draft";
 
 export interface DocOf {
   cook: CookDoc;
   item: ItemDoc;
   settings: SettingsDoc;
   recipe: RecipeCopy;
+  draft: DraftDoc;
 }
 
 export interface ServerRow<K extends Kind = Kind> {
