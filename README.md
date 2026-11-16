@@ -78,6 +78,10 @@ Phone / browser (PWA)              Server
   the cooking slot `early`, one with no cook `orphan`
   (`backend/mealplan/plan.py`, `frontend/src/plan.ts`).
 
+Recipes archived in Recipie (`archived` on the recipe) stay in the copy, so a
+meal already planned keeps its name, but aren't offered when adding a meal
+(web, Friday's Plan) or listed to Claude (`list_recipes`).
+
 ## Adding the connector in Claude
 
 Settings → Connectors → Add custom connector:

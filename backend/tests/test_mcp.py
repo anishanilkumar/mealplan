@@ -106,3 +106,16 @@ def test_list_recipes_has_lids():
     rows = call("list_recipes")
     assert [r["title"] for r in rows] == ["Chicken curry", "Sambar"]
     assert rows[0]["lid"] == "ready"  # no ingredients: nothing missing
+
+
+def test_archived_recipes_are_not_offered(env):
+    import json as _json
+
+    from mealplan import recipes as _recipes
+
+    rows = _json.loads(env.read_text())
+    rows[1]["doc"]["archived"] = True
+    rows[1]["rev"] += 1
+    env.write_text(_json.dumps(rows))
+    _recipes.refresh()
+    assert [r["title"] for r in call("list_recipes")] == ["Chicken curry"]

@@ -53,6 +53,8 @@ export interface Recipe {
   servings?: number | null;
   tags?: string[];
   ingredients?: Ingredient[];
+  /** Put away in Recipie: not offered when planning. */
+  archived?: boolean;
   [k: string]: unknown;
 }
 

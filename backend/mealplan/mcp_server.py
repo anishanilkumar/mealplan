@@ -140,6 +140,9 @@ def register(mcp: FastMCP) -> FastMCP:
         out = []
         for r in db.list_live("recipe"):
             doc = r["doc"]["recipe"]
+            # Put away in Recipie: not to be suggested.
+            if doc.get("archived"):
+                continue
             if q and q not in doc["title"].casefold() and not any(q in t.casefold() for t in doc.get("tags") or []):
                 continue
             v = cookable.assess(doc, stock_now)

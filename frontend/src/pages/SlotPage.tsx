@@ -170,6 +170,8 @@ function AddRecipe({ plan, date, slot }: { plan: Plan; date: string; slot: Slot 
   const list = useMemo(() => {
     const needle = q.trim().toLocaleLowerCase();
     return [...plan.recipes.entries()]
+      // Put away in Recipie: not offered (one already on the plan still shows there).
+      .filter(([, r]) => !r.recipe.archived)
       .map(([id, r]) => ({ id, title: r.recipe.title, servings: r.recipe.servings ?? null }))
       .filter((r) => !needle || r.title.toLocaleLowerCase().includes(needle))
       .sort((a, b) => a.title.localeCompare(b.title));
