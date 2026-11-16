@@ -65,6 +65,11 @@ input.tick:disabled:checked { box-shadow: inset 0 0 0 4px var(--panel), inset 0 
 
 .foot { gap: 0.5rem; flex-wrap: wrap; }
 
+.settings { display: flex; flex-direction: column; gap: 0.875rem; }
+.settings h2 { margin: 0; }
+.settings-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.field input[type="time"] { color-scheme: dark; font-family: var(--face-mono); }
+
 /* ---- Claude's drafts ----------------------------------------------------- */
 
 /* A proposal, not the plan: an arc rule down its side says "waiting for you". */

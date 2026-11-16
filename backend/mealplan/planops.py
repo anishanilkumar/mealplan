@@ -74,6 +74,7 @@ def set_slot(day: str, slot: str, entries: list[Entry], *, replace: bool, user: 
     takes its pot with it; leftovers elsewhere from that pot stay, marked)."""
     if slot not in SLOTS:
         raise ValueError(f"slot is one of {', '.join(SLOTS)}")
+    entries = [e if isinstance(e, Entry) else Entry.model_validate(e) for e in entries]
     with db.write_tx() as conn:
         removed = []
         if replace:

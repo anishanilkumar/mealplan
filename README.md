@@ -14,7 +14,7 @@ its decisions and the phases are in [docs/DESIGN.md](docs/DESIGN.md).
 
 ## Status
 
-Phases 1 (the plan), 2 (the pantry) and 3 (Claude) are built and deployed:
+Phases 1 (the plan), 2 (the pantry), 3 (Claude) and 5 (nudges, Recipie and Foodlog) are built and deployed:
 
 - the rolling week, each meal's editor (recipe, leftovers, text; portions,
   servings, eaten or skipped, move, remove), a pot's page, settings
@@ -33,6 +33,13 @@ Phases 1 (the plan), 2 (the pantry) and 3 (Claude) are built and deployed:
 - Claude: `get_plan`, `cook_history`, `list_recipes`, `whats_missing`; `set_slot`
   writes one meal when asked; `propose_week` saves a draft that shows on the
   week to accept (fills only empty meals) or dismiss
+
+- nudges to Friday (`notify.anish` over NATS): tonight's dinner with its lid,
+  meals not planned in the next days, and the evening before a recipe with a
+  prepare-ahead note (Recipie's `prep_ahead`: "soak the chickpeas"); times
+  set in the app, each at most once a day (`backend/mealplan/nudges.py`)
+- Foodlog's estimates get the day's plan as a hint
+  (`/api/service/meals`, read only, Foodlog's own Kanidm client)
 
 **Not yet in Friday.** Friday's Plan section is phase 4; until then the plan
 is web only.
@@ -117,6 +124,8 @@ repo beside this one.
 | `MEALPLAN_RECIPIE_TOKEN_URL` / `_CLIENT_ID` / `_CLIENT_SECRET` | Kanidm client-credentials for Recipie's service feed |
 | `MEALPLAN_RECIPES_REFRESH` | Seconds between looks at Recipie without a ping (600) |
 | `MEALPLAN_MCP_OIDC_ISSUER` / `_JWKS_URI` / `_AUDIENCE` / `_SCOPES` | The connector's bearer tokens (Kanidm client `claude-mealplan`) |
+| `MEALPLAN_SERVICE_INTROSPECT_URL` / `MEALPLAN_SERVICE_CLIENTS` | Service tokens (Foodlog) for `/api/service/meals`, checked with Kanidm |
+| `MEALPLAN_NUDGE_USER` | Whose Friday the nudges go to (`anish`) |
 | `MEALPLAN_RECIPIE_SCOPE` | Scope to ask Kanidm for (none) |
 | `GROCY_API_URL` / `GROCY_API_KEY` | The pantry, through grocy-mcp (on `PYTHONPATH`) |
 | `GROCY_MCP_NATS_*` | `pantry.changed` out, after booking a pot out |

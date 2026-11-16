@@ -13,7 +13,7 @@ from typing import Literal
 from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from pydantic import BaseModel, Field, ValidationError
 
-from . import auth_web, db, pantry, planops, recipes, stock
+from . import auth_web, db, nudges, pantry, planops, recipes, service, stock
 from .models import MODELS
 
 log = logging.getLogger(__name__)
@@ -66,6 +66,7 @@ def create_app(*, watch_recipes: bool = True) -> FastAPI:
     if watch_recipes:
         recipes.watch()
         pantry.watch_changes()
+        nudges.start()
 
     @app.get("/api/health")
     def health():
@@ -127,6 +128,12 @@ def create_app(*, watch_recipes: bool = True) -> FastAPI:
             return stock.unbook(cook_id, user)
         except KeyError:
             raise HTTPException(404, "No such pot.")
+
+    # --- other services (Foodlog's estimates): read only ---------------------------
+
+    @app.get("/api/service/meals")
+    def service_meals(day: str = Query(pattern=DATE), caller: str = Depends(service.require_service)):
+        return service.meals(day)
 
     # --- Claude's drafts (phase 3) -----------------------------------------------
 
